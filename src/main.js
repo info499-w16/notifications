@@ -1,12 +1,15 @@
-import {Promise} from 'bluebird'
-import {default as AWS} from 'aws-sdk'
+import {default as koa} from 'koa'
+import {default as bodyParser} from 'koa-bodyparser'
 
 import {default as heartbeat} from './heartbeat'
+import {default as route} from './routes'
 
+// Constants
 const NAME = 'notifications'
 const VERSION = '0.0.1'
+const PORT = process.env.PORT || 80
 
-// Load environment variables
+// Load required environment variables
 function loadEnv (envName) {
   const env = process.env[envName]
   if (!env) throw new Error('Failed to load ENV variable: ' + envName)
@@ -17,28 +20,12 @@ function loadEnv (envName) {
 loadEnv('AWS_ACCESS_KEY_ID')
 loadEnv('AWS_SECRET_ACCESS_KEY')
 
-// Sets region to Virginia. This is because this is the only
-// region which supports SMS (as of 2/11/2016)
-AWS.config.update({region: 'us-east-1'})
+koa()
+  .use(bodyParser())
+  .use(route.routes())
+  .listen(PORT)
 
-// Test out using SNS
-const sns = new AWS.SNS()
-Promise.promisifyAll(sns)
-
-const params = {
-  Message: 'Test Message',
-  Subject: 'Test Email',
-  TopicArn: 'arn:aws:sns:us-east-1:867131015577:test'
-}
-
-// Publish a message
-sns.publishAsync(params)
-  .then(data => {
-    console.log(data) // successful response
-  })
-  .catch(e => {
-    console.log(e)
-  })
+console.log(`Notification service running on port ${PORT}`)
 
 // Send beat data
 heartbeat(NAME, VERSION)

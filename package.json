@@ -37,6 +37,10 @@
     "bluebird": "^3.3.0",
     "koa": "^1.1.2",
     "koa-bodyparser": "^2.0.1",
-    "koa-router": "^5.4.0"
+    "koa-router": "^5.4.0",
+    "lodash": "^4.3.0",
+    "node-redis": "^0.1.7",
+    "request-promise": "^2.0.0",
+    "uuid": "^2.0.1"
   }
 }
