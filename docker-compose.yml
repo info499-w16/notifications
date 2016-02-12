@@ -1,0 +1,16 @@
+version: '2'
+services:
+  notifications:
+    image: calebt5/info499.notifications
+    depends_on:
+      - notification_store
+    network_mode: "service:notification_store"
+    environment:
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+  notification_store:
+    image: redis
+    expose:
+      - "80"
+    ports:
+      - 8080:80
