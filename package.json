@@ -30,6 +30,7 @@
     "gulp-standard": "^5.2.2"
   },
   "dependencies": {
+    "aws-sdk": "^2.2.35",
     "babel-polyfill": "^6.3.14",
     "babel-preset-es2015-node5": "^1.1.2",
     "babel-register": "^6.4.3"
