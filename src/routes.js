@@ -14,7 +14,7 @@ const rc = redis.createClient()
 AWS.config.update({region: 'us-east-1'})
 
 // Make a promise friendly version of the API
-const sns = new AWS.SNS()
+const sns = new AWS.SNS({region: 'us-east-1'})
 Promise.promisifyAll(sns)
 
 export default new Router()
