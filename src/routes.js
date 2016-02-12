@@ -9,13 +9,13 @@ import {default as redis} from 'node-redis'
 Promise.promisifyAll(redis.RedisClient.prototype)
 const rc = redis.createClient()
 
-// Make a promise friendly version of the API
-const sns = new AWS.SNS()
-Promise.promisifyAll(sns)
-
 // Sets region to Virginia. This is because this is the only
 // region which supports SMS (as of 2/11/2016)
 AWS.config.update({region: 'us-east-1'})
+
+// Make a promise friendly version of the API
+const sns = new AWS.SNS()
+Promise.promisifyAll(sns)
 
 export default new Router()
   .post('/topic', function *(next) {
@@ -39,7 +39,7 @@ export default new Router()
         .value()
 
       const params = {
-        Name: this.request.body.topicName,
+        Name: this.request.body.topicName
         // DisplayName: this.request.body.displayName // needed for sms
       }
       // Make a new topic (idempotent)
