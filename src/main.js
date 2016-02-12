@@ -1,6 +1,11 @@
 import {Promise} from 'bluebird'
 import {default as AWS} from 'aws-sdk'
 
+import {default as heartbeat} from './heartbeat'
+
+const NAME = 'notifications'
+const VERSION = '0.0.1'
+
 // Load environment variables
 function loadEnv (envName) {
   const env = process.env[envName]
@@ -18,13 +23,15 @@ AWS.config.update({region: 'us-east-1'})
 
 // Test out using SNS
 const sns = new AWS.SNS()
+Promise.promisifyAll(sns)
+
 const params = {
   Message: 'Test Message',
   Subject: 'Test Email',
   TopicArn: 'arn:aws:sns:us-east-1:867131015577:test'
 }
 
-Promise.promisifyAll(sns)
+// Publish a message
 sns.publishAsync(params)
   .then(data => {
     console.log(data) // successful response
@@ -32,3 +39,6 @@ sns.publishAsync(params)
   .catch(e => {
     console.log(e)
   })
+
+// Send beat data
+heartbeat(NAME, VERSION)
