@@ -1,7 +1,8 @@
+import {Promise} from 'bluebird'
 import {default as AWS} from 'aws-sdk'
 
 // Load environment variables
-function loadEnv(envName) {
+function loadEnv (envName) {
   const env = process.env[envName]
   if (!env) throw new Error('Failed to load ENV variable: ' + envName)
 }
@@ -16,13 +17,18 @@ loadEnv('AWS_SECRET_ACCESS_KEY')
 AWS.config.update({region: 'us-east-1'})
 
 // Test out using SNS
-const sns = new AWS.SNS();
+const sns = new AWS.SNS()
 const params = {
-  Message: 'Hello, i iz temmie', /* required */
-  Subject: 'Haiiiiiiiiiiiii',
+  Message: 'Test Message',
+  Subject: 'Test Email',
   TopicArn: 'arn:aws:sns:us-east-1:867131015577:test'
 }
-sns.publish(params, function (err, data) {
-  if (err) console.log(err, err.stack); // an error occurred
-  else console.log(data); // successful response
-});
+
+Promise.promisifyAll(sns)
+sns.publishAsync(params)
+  .then(data => {
+    console.log(data) // successful response
+  })
+  .catch(e => {
+    console.log(e)
+  })
