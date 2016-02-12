@@ -57,6 +57,7 @@ export default new Router()
       this.status = 200
       this.body = 'Successfully created a new subscription topic'
     } catch (e) {
+      console.log(e)
       this.throw(400, e)
     }
   })
@@ -93,6 +94,6 @@ function batchSub (endpoints, arn) {
       }
       return sns.subscribeAsync(params)
     })
-    return Promise.map(subscriptions)
+    return Promise.all(subscriptions)
   }
 }
