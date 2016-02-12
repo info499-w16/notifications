@@ -28,7 +28,7 @@ export default new Router()
       //
       // We subscribe the users based on what information is provided. If
       // users don't want to subscribe via sms or at all, don't send anything
-      const users = this.body.subscribers
+      const users = this.request.body.subscribers
       const emails = _.chain(users)
         .filter(user => user.email)
         .map(user => user.email)
@@ -39,17 +39,17 @@ export default new Router()
         .value()
 
       const params = {
-        Name: this.body.topicName,
-        DisplayName: this.body.displayName // needed for sms
+        Name: this.request.body.topicName,
+        // DisplayName: this.request.body.displayName // needed for sms
       }
       // Make a new topic (idempotent)
       const {TopicArn} = yield sns.createTopicAsync(params)
       // now store the Arn for easy lookup in the future
-      rc.set(this.body.topicName, TopicArn)
+      rc.set(this.request.body.topicName, TopicArn)
 
       // With the topic created, we want to now add the subscribers that were
       // included by default
-      yield [ // Yield as an array to perform in parellel
+      yield [ // Yield as an array to perform in parallel
         batchSub(emails, TopicArn)('email'),
         batchSub(numbers, TopicArn)('sms')
       ]
@@ -66,8 +66,8 @@ export default new Router()
       // Lookup the arn for the topic we created
       const arn = yield rc.getAsync(this.params.name)
       const params = {
-        Message: this.body.message,
-        Subject: this.body.subject,
+        Message: this.request.body.message,
+        Subject: this.request.body.subject,
         TopicArn: arn
       }
 
