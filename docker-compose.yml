@@ -1,7 +1,7 @@
 version: '2'
 services:
   notifications:
-    image: calebt5/info499.notifications
+    build: .
     depends_on:
       - notification_store
     network_mode: "service:notification_store"
