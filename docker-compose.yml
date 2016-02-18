@@ -6,8 +6,7 @@ services:
       - notification_store
     network_mode: "service:notification_store"
     environment:
-      - AWS_ACCESS_KEY_ID
-      - AWS_SECRET_ACCESS_KEY
+      - POSTMARK_API_KEY
   notification_store:
     image: redis
     expose:
