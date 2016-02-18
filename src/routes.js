@@ -6,6 +6,7 @@ import {default as redis} from 'node-redis'
 import {default as jade} from 'jade'
 
 import {loadEnv} from './utils'
+import {MissingParam} from './errors'
 
 // Configure postmark
 const postClient = Promise.promisifyAll(new postmark.Client(loadEnv('POSTMARK_API_KEY')))
@@ -48,6 +49,10 @@ export default new Router()
 
       // Compile the message to send
       const generator = jade.compile(template)
+
+      const locals = this.request.body.locals
+      if (!locals) throw new MissingParam('locals')
+
       const message = generator(this.request.body.locals)
       console.log(message)
       yield batchSend(emails, message)

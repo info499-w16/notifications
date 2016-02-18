@@ -4,3 +4,9 @@ export class EnvMissing extends Error {
     super(msg)
   }
 }
+
+export class MissingParam extends Error {
+	constructor (name) {
+		super('Missing required parameter: ' + name)
+	}
+}
