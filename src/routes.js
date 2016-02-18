@@ -37,24 +37,30 @@ export default new Router()
   // Select a given template and send the message to the given list
   // Takes a json object with locals for the jade template
   .post('/template/:name/:listName/send', function *(next) {
-    // Load up the template
-    const template = yield rc.getAsync(`template:${this.params.name}`)
-    // Load up the emails to send
-    const emails = yield rc.smembersAsync(`list:${this.params.name}`)
+    try {
+      // Load up the template
+      const template = yield rc.getAsync(`template:${this.params.name}`)
+      // Load up the emails to send
+      const emailBuffers = yield rc.smembersAsync(`list:${this.params.listName}`)
+      const emails = _.map(emailBuffers, buff => buff.toString())
+      console.log('Sends emails to the following addresses')
+      console.log(emails)
 
-    const locals = this.request.body.locals
-
-    // Compile the message to send
-    const generator = jade.compile(template)
-    const message = generator(locals)
-    yield batchSend(emails, message)
-    this.body = 'Successfully emailed everyone in the list'
+      // Compile the message to send
+      const generator = jade.compile(template)
+      const message = generator(this.request.body.locals)
+      console.log(message)
+      yield batchSend(emails, message)
+      this.body = 'Successfully emailed everyone in the list'
+    } catch (e) {
+      this.throw(400, e)
+    }
   })
 
 // Send the list of emails the given HTML document
 function batchSend (emails, msg) {
   const messages = _.map(emails, email => {
-    return postClient.sendEmail({
+    return postClient.sendEmailAsync({
       'From': 'caleb@thorsteinson.io',
       'To': email,
       'Subject': 'Test',
@@ -63,3 +69,15 @@ function batchSend (emails, msg) {
   })
   return Promise.all(messages)
 }
+
+// Sets a dummy template for testing
+const dummyJade = `
+doctype html
+html(lang="en")
+  head
+  body
+    h1 Hello #{className}
+    p.
+      Hey, this is an email!`
+
+rc.set('template:dummy', dummyJade)
